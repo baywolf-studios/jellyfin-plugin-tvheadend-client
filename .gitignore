@@ -1,0 +1,10 @@
+bin/
+obj/
+.vs/
+.idea/
+artifacts
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+Jellyfin.Plugin.TvHeadendClient.sln.DotSettings.user
+.DS_Store

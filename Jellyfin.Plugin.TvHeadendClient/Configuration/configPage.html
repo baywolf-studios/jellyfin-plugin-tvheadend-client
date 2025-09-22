@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>TvHeadend Client</title>
+</head>
+<body>
+<div class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-select,emby-checkbox"
+     data-role="page" id="TvHeadendClientConfigPage">
+    <div data-role="content">
+        <div class="content-primary">
+            <form id="TvHeadendClientConfigForm">
+                <div class="inputContainer">
+                    <label class="inputLabel inputLabelUnfocused" for="Host">Host</label>
+                    <input id="Host" is="emby-input" name="Host" type="text"/>
+                    <div class="fieldDescription">The hostname or IP address of your TvHeadend server.</div>
+                </div>
+                <div class="inputContainer">
+                    <label class="inputLabel inputLabelUnfocused" for="Port">Port</label>
+                    <input id="Port" is="emby-input" min="0" name="Port" type="number"/>
+                    <div class="fieldDescription">The port number used by TvHeadend.</div>
+                </div>
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                    <label class="emby-checkbox-label">
+                        <input id="UseSslSetting" is="emby-checkbox" name="UseSslCheckBox" type="checkbox"/>
+                        <span>Use SSL</span>
+                    </label>
+                    <div class="fieldDescription">Enable if your TvHeadend server uses HTTPS instead of HTTP.</div>
+                </div>
+                <div class="inputContainer">
+                    <label class="inputLabel inputLabelUnfocused" for="Username">Username</label>
+                    <input id="Username" is="emby-input" name="User" type="text"/>
+                    <div class="fieldDescription">The username for accessing TvHeadend (if authentication is enabled).</div>
+                </div>
+                <div class="inputContainer">
+                    <label class="inputLabel inputLabelUnfocused" for="Password">Password</label>
+                    <input id="Password" is="emby-input" name="User" type="password"/>
+                    <div class="fieldDescription">The password for the above username.</div>
+                </div>
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                    <label class="emby-checkbox-label">
+                        <input id="HideRecordingsChannelSetting" is="emby-checkbox" name="HideRecordingsChannelCheckBox"
+                               type="checkbox"/>
+                        <span>Hide Recordings Channel</span>
+                    </label>
+                    <div class="fieldDescription">Hides the virtual “Recordings” channel.</div>
+                </div>
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                    <label class="emby-checkbox-label">
+                        <input id="ForceAllProgramsAsSeriesSetting" is="emby-checkbox" name="ForceAllProgramsAsSeriesCheckBox"
+                               type="checkbox"/>
+                        <span>Force all Programs as Series</span>
+                    </label>
+                    <div class="fieldDescription">Treats all programs as series so Jellyfin can create TvHeadend autorecs, even if series info is missing in the EPG.</div>
+                </div>
+                <div>
+                    <button class="raised button-submit block emby-button" is="emby-button" type="submit">
+                        <span>Save</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript">
+        var TvHeadendClientConfig = {
+            pluginUniqueId: 'd2762daa-c6a2-4ede-b513-36b09a9f1752'
+        };
+
+        document.querySelector('#TvHeadendClientConfigPage')
+            .addEventListener('pageshow', function () {
+                Dashboard.showLoadingMsg();
+                ApiClient.getPluginConfiguration(TvHeadendClientConfig.pluginUniqueId).then(function (config) {
+                    document.querySelector('#Host').value = config.Host;
+                    document.querySelector('#Port').value = config.Port;
+                    document.querySelector('#UseSslSetting').checked = config.UseSsl;
+                    document.querySelector('#Username').value = config.Username;
+                    document.querySelector('#Password').value = config.Password;
+                    document.querySelector('#HideRecordingsChannelSetting').checked = config.HideRecordingsChannel;
+                    document.querySelector('#ForceAllProgramsAsSeriesSetting').checked = config.ForceAllProgramsAsSeries;
+                    Dashboard.hideLoadingMsg();
+                });
+            });
+
+        document.querySelector('#TvHeadendClientConfigForm')
+            .addEventListener('submit', function (e) {
+                Dashboard.showLoadingMsg();
+                ApiClient.getPluginConfiguration(TvHeadendClientConfig.pluginUniqueId).then(function (config) {
+                    config.Host = document.querySelector('#Host').value;
+                    config.Port = document.querySelector('#Port').value;
+                    config.UseSsl = document.querySelector('#UseSslSetting').checked;
+                    config.Username = document.querySelector('#Username').value;
+                    config.Password = document.querySelector('#Password').value;
+                    config.HideRecordingsChannel = document.querySelector('#HideRecordingsChannelSetting').checked;
+                    config.ForceAllProgramsAsSeries = document.querySelector('#ForceAllProgramsAsSeriesSetting').checked;
+                    ApiClient.updatePluginConfiguration(TvHeadendClientConfig.pluginUniqueId, config).then(function (result) {
+                        Dashboard.processPluginConfigurationUpdateResult(result);
+                    });
+                });
+
+                e.preventDefault();
+                return false;
+            });
+    </script>
+</div>
+</body>
+</html>
