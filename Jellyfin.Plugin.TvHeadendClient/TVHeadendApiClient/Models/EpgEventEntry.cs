@@ -24,8 +24,7 @@ public record EpgEventEntry
 
     [JsonPropertyName("stop")] public long? Stop { get; init; }
 
-    [JsonIgnore]
-    public DateTime? StopDateTime => Stop.HasValue ? DateTimeOffset.FromUnixTimeSeconds(Stop.Value).UtcDateTime : null;
+    [JsonIgnore] public DateTime? StopDateTime => Stop.HasValue ? DateTimeOffset.FromUnixTimeSeconds(Stop.Value).UtcDateTime : null;
 
     [JsonPropertyName("title")] public string? Title { get; init; }
 

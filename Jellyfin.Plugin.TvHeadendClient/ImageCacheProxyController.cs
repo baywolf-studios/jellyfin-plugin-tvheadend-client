@@ -25,7 +25,10 @@ public class ImageCacheProxyController(
                 .GetImageAsync(Plugin.ConnectionInfo, $"imagecache/{id}")
                 .ConfigureAwait(false);
 
-            if (imageBytes is null || imageBytes.Length == 0) return NotFound();
+            if (imageBytes is null || imageBytes.Length == 0)
+            {
+                return NotFound();
+            }
 
             return File(imageBytes,
                 ImageUtilities.TryGetImageType(imageBytes, out var imageFormat)

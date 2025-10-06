@@ -12,11 +12,7 @@ public static partial class HttpClientExtensions
 {
     private const string NonceCount = "00000001";
 
-    private static readonly JsonSerializerOptions JsonSerializerOptions = new()
-    {
-        PropertyNameCaseInsensitive = true,
-        Converters = { new IntToBoolConverter(), new IntToStringConverter() }
-    };
+    private static readonly JsonSerializerOptions JsonSerializerOptions = new() { PropertyNameCaseInsensitive = true, Converters = { new IntToBoolConverter(), new IntToStringConverter() } };
 
     private static readonly DigestChallenge DefaultDigestChallenge =
         new(string.Empty, string.Empty, string.Empty, string.Empty);
@@ -142,16 +138,22 @@ public static partial class HttpClientExtensions
             clone.Content = new StreamContent(ms);
 
             foreach (var h in req.Content.Headers)
+            {
                 clone.Content.Headers.TryAddWithoutValidation(h.Key, h.Value);
+            }
         }
 
         clone.Version = req.Version;
 
         foreach (var option in req.Options)
+        {
             clone.Options.Set(new HttpRequestOptionsKey<object?>(option.Key), option.Value);
+        }
 
         foreach (var header in req.Headers)
+        {
             clone.Headers.TryAddWithoutValidation(header.Key, header.Value);
+        }
 
         return clone;
     }

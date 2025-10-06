@@ -83,7 +83,9 @@ public class RecordingsChannel(
                     && dvrConfigs.TryGetValue(dvrEvent.ConfigName ?? Guid.NewGuid().ToString(), out var dvrConfig)
                     && !string.IsNullOrEmpty(dvrConfig.Storage)
                     && dvrEvent.Filename.StartsWith(dvrConfig.Storage))
+                {
                     uriPath = dvrEvent.Filename.Substring(dvrConfig.Storage.Length - 1);
+                }
 
 #pragma warning disable CS8604 // Possible null reference argument.
                 return (Uri: new Uri(uriPath), DvrEvent: dvrEvent);
@@ -105,7 +107,10 @@ public class RecordingsChannel(
 
             foreach (var dvrEvent in dvrEventsWithData)
             {
-                if (!dvrEvent.Uri.AbsolutePath.StartsWith(currentFolderPathPrefix)) continue;
+                if (!dvrEvent.Uri.AbsolutePath.StartsWith(currentFolderPathPrefix))
+                {
+                    continue;
+                }
 
                 if (dvrEvent.Uri.Segments.Length == itemSegmentDepth)
                 {
@@ -149,6 +154,7 @@ public class RecordingsChannel(
     public Task<DynamicImageResponse> GetChannelImage(ImageType type, CancellationToken cancellationToken)
     {
         if (type == ImageType.Primary)
+        {
             return Task.FromResult(new DynamicImageResponse
             {
                 Path =
@@ -156,11 +162,9 @@ public class RecordingsChannel(
                 Protocol = MediaProtocol.Http,
                 HasImage = true
             });
+        }
 
-        return Task.FromResult(new DynamicImageResponse
-        {
-            HasImage = false
-        });
+        return Task.FromResult(new DynamicImageResponse { HasImage = false });
     }
 
     public IEnumerable<ImageType> GetSupportedChannelImages()
@@ -202,17 +206,8 @@ public class RecordingsChannel(
                     UseMostCompatibleTranscodingProfile = true,
                     MediaStreams =
                     [
-                        new MediaStream
-                        {
-                            Type = MediaStreamType.Video,
-                            Index = -1,
-                            IsInterlaced = true
-                        },
-                        new MediaStream
-                        {
-                            Type = MediaStreamType.Audio,
-                            Index = -1
-                        }
+                        new MediaStream { Type = MediaStreamType.Video, Index = -1, IsInterlaced = true },
+                        new MediaStream { Type = MediaStreamType.Audio, Index = -1 }
                     ]
                 }
             ;
@@ -220,8 +215,7 @@ public class RecordingsChannel(
         try
         {
             var calculatedMediaSourceInfo = await mediaEncoder.GetMediaInfo(
-                new MediaInfoRequest
-                    { ExtractChapters = false, MediaSource = mediaSourceInfo, MediaType = DlnaProfileType.Video },
+                new MediaInfoRequest { ExtractChapters = false, MediaSource = mediaSourceInfo, MediaType = DlnaProfileType.Video },
                 cancellationToken);
             mediaSourceInfo.MediaStreams = calculatedMediaSourceInfo.MediaStreams;
         }
@@ -229,7 +223,7 @@ public class RecordingsChannel(
         {
             logger.LogWarning(ex, "GetChannelItemMediaInfo: Failed to probe media streams for {Id} using fallback", id);
         }
-        
+
         return [mediaSourceInfo];
     }
 
@@ -293,7 +287,10 @@ public class RecordingsChannel(
     private ChannelItemInfo ConvertToChannelItem(DvrEventEntry dvrEventEntry)
     {
         if (string.IsNullOrEmpty(dvrEventEntry.Uuid) || string.IsNullOrEmpty(dvrEventEntry.Url))
+        {
             return new ChannelItemInfo();
+        }
+
         logger.LogInformation("ConvertToChannelItem: {id}", dvrEventEntry.Uuid);
 
         var isCurrentlyRecording = dvrEventEntry.SchedStatus == "recording";
