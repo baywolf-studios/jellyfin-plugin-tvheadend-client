@@ -1,7 +1,7 @@
 <Project>
     <PropertyGroup>
-        <Version>0.0.0.0</Version>
-        <AssemblyVersion>0.0.0.0</AssemblyVersion>
-        <FileVersion>0.0.0.0</FileVersion>
+        <Version>untagged-9879fd015336b24dfd1c.0.0.0</Version>
+        <AssemblyVersion>untagged-9879fd015336b24dfd1c.0.0.0</AssemblyVersion>
+        <FileVersion>untagged-9879fd015336b24dfd1c.0.0.0</FileVersion>
     </PropertyGroup>
 </Project>
