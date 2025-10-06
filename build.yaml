@@ -13,6 +13,7 @@ owner: "Bay Wolf Studios LLC"
 artifacts:
   - "Jellyfin.Plugin.TvHeadendClient.dll"
 changelog: |-
+  - Prepare for release v1 (#12) @github-actions
   - Create README.md (#10) @matthewpritchett
   - Prepare for release untagged-bc531becdabe3693633b (#8) @github-actions
   - Update README.md (#7) @matthewpritchett
