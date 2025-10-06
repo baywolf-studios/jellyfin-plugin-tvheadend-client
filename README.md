@@ -1,1 +1,1 @@
-Jellyfin Plugin TvHeadend Client
+Jellyfin Plugin TvHeadend Client 
