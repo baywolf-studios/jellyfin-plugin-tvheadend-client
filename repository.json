@@ -1,11 +1,21 @@
 [
   {
     "category": "Live TV",
-    "description": "This plugin securely connects Jellyfin with your TvHeadend setup. Stream live TV, navigate the full EPG, and control DVR scheduling. It exclusively uses Digest Authentication for secure access and proxies Tvheadend's image cache.",
+    "description": "This plugin securely connects Jellyfin with your TvHeadend setup. Stream live TV, navigate the full EPG, and control DVR scheduling. It exclusively uses Digest Authentication for secure access and proxies Tvheadend's image cache.\n",
     "guid": "d2762daa-c6a2-4ede-b513-36b09a9f1752",
+    "imageUrl": "https://raw.githubusercontent.com/baywolf-studios/jellyfin-plugin-tvheadend-client/main/images/jellyfin-plugin-tvheadend-client.png",
     "name": "TvHeadend Client",
     "overview": "A plugin that brings TvHeadend's Live TV and DVR capabilities into Jellyfin.",
     "owner": "Bay Wolf Studios LLC",
-    "versions": []
+    "versions": [
+      {
+        "changelog": "<!-- Optional: add a release summary here -->\r\n## :sparkles: What's New\r\n\r\n* Initial Release\r\n",
+        "checksum": "f9e319a5a0815474f3fa526f892219c3",
+        "sourceUrl": "https://github.com/baywolf-studios/jellyfin-plugin-tvheadend-client/releases/download/v1/tvheadend-client_1.0.0.0.zip",
+        "targetAbi": "10.10.7.0",
+        "timestamp": "2025-10-06T15:44:23Z",
+        "version": 1
+      }
+    ]
   }
 ]
