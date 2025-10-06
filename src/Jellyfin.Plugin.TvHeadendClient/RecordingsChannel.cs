@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Reflection;
 using Jellyfin.Plugin.TvHeadendClient.Helpers;
 using Jellyfin.Plugin.TvHeadendClient.TVHeadendApiClient;
 using Jellyfin.Plugin.TvHeadendClient.TVHeadendApiClient.Models;
@@ -157,8 +158,7 @@ public class RecordingsChannel(
         {
             return Task.FromResult(new DynamicImageResponse
             {
-                Path =
-                    "https://raw.githubusercontent.com/jellyfin/jellyfin-ux/master/plugins/repository/jellyfin-plugin-tvheadend.png",
+                Path = "https://raw.githubusercontent.com/baywolf-studios/jellyfin-plugin-tvheadend-client/main/images/recordings-channel.png",
                 Protocol = MediaProtocol.Http,
                 HasImage = true
             });
