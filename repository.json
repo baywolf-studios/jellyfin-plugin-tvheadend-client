@@ -9,12 +9,12 @@
     "owner": "Bay Wolf Studios LLC",
     "versions": [
       {
-        "changelog": "<!-- Optional: add a release summary here -->\r\n## :sparkles: What's New\r\n\r\n* Initial Release\r\n",
-        "checksum": "f9e319a5a0815474f3fa526f892219c3",
-        "sourceUrl": "https://github.com/baywolf-studios/jellyfin-plugin-tvheadend-client/releases/download/v1/tvheadend-client_1.0.0.0.zip",
+        "changelog": "<!-- Optional: add a release summary here -->\r\n## :sparkles: What's New\r\n\r\n* Initial Release v2\r\n",
+        "checksum": "f6525253d3520d0aac9ce17c9abc548e",
+        "sourceUrl": "https://github.com/baywolf-studios/jellyfin-plugin-tvheadend-client/releases/download/v2/tvheadend-client_2.0.0.0.zip",
         "targetAbi": "10.10.7.0",
-        "timestamp": "2025-10-06T15:44:23Z",
-        "version": "1.0.0.0"
+        "timestamp": "2025-10-06T16:17:33Z",
+        "version": "2.0.0.0"
       }
     ]
   }
