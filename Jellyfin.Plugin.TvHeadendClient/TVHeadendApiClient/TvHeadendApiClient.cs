@@ -214,7 +214,9 @@ public partial class TvHeadendApiClient(IHttpClientFactory httpClientFactory) : 
 
         var streamPathMatch = HttpRegex().Match(response ?? string.Empty);
         if (!streamPathMatch.Success)
+        {
             throw new InvalidOperationException("Failed to find a valid stream path in the response.");
+        }
 
         return streamPathMatch.Value;
     }
@@ -232,7 +234,9 @@ public partial class TvHeadendApiClient(IHttpClientFactory httpClientFactory) : 
 
         var streamPathMatch = HttpRegex().Match(response ?? string.Empty);
         if (!streamPathMatch.Success)
+        {
             throw new InvalidOperationException("Failed to find a valid stream path in the response.");
+        }
 
         return streamPathMatch.Value;
     }
@@ -306,11 +310,16 @@ public partial class TvHeadendApiClient(IHttpClientFactory httpClientFactory) : 
     public async Task<byte[]?> GetImageAsync(DigestConnectionInfo connectionInfo, string url,
         CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(url)) return null;
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            return null;
+        }
 
         var httpClient = httpClientFactory.CreateClient(PluginInfo.Name);
         if (url.StartsWith("imagecache", StringComparison.OrdinalIgnoreCase))
+        {
             httpClient.BaseAddress = connectionInfo.BaseUri;
+        }
 
         var image = await httpClient.GetAndReadAsByteArrayWithDigestAuthAsync(url, connectionInfo.Username,
             connectionInfo.Password, cancellationToken);

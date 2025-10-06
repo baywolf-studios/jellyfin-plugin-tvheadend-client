@@ -39,7 +39,7 @@ public static class ImageUtilities
             // SVG can also start with '<svg' if the XML declaration is omitted.
             // Note: This pattern might be less robust for detection in a generic header check.
             [0x3C, 0x73, 0x76, 0x67],
-            // Optional: With UTF-8 BOM, followed by <?xml 
+            // Optional: With UTF-8 BOM, followed by <?xml
             // BOM: 0xEF, 0xBB, 0xBF, followed by <?xml (0x3C, 0x3F, 0x78, 0x6D, 0x6C)
             [0xEF, 0xBB, 0xBF, 0x3C, 0x3F, 0x78, 0x6D, 0x6C]
         ]
@@ -53,14 +53,20 @@ public static class ImageUtilities
         foreach (var signature in signatures)
         {
             if (imageData.Length < signature.Length)
+            {
                 continue;
+            }
 
             var isMatch = true;
 
             for (var i = 0; i < signature.Length; i++)
             {
                 var expectedByte = signature[i];
-                if (!expectedByte.HasValue || imageData[i] == expectedByte.Value) continue;
+                if (!expectedByte.HasValue || imageData[i] == expectedByte.Value)
+                {
+                    continue;
+                }
+
                 isMatch = false;
                 break;
             }

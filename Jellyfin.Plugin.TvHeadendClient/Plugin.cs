@@ -12,7 +12,7 @@ namespace Jellyfin.Plugin.TvHeadendClient;
 public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
 {
     private static Plugin? _instance;
-    
+
     public Plugin(IApplicationPaths applicationPaths, IXmlSerializer xmlSerializer)
         : base(applicationPaths, xmlSerializer)
     {
@@ -24,7 +24,7 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
     public override Guid Id => PluginInfo.Id;
 
     public static Plugin Instance => _instance ?? throw new InvalidOperationException("Plugin instance not available");
-    
+
     public static DigestConnectionInfo ConnectionInfo => Instance.Configuration.ToConnectionInfo();
 
     public IEnumerable<PluginPageInfo> GetPages()

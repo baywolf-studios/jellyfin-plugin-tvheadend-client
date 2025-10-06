@@ -187,6 +187,7 @@ public class LiveTvService(
                 .ConfigureAwait(false);
 
             foreach (var entry in response.Entries)
+            {
                 timers.Add(new TimerInfo
                 {
                     // ProviderIds
@@ -213,7 +214,6 @@ public class LiveTvService(
                         "conflictedNotOk" => RecordingStatus.ConflictedNotOk,
                         _ => RecordingStatus.Error
                     },
-
                     PrePaddingSeconds = entry.StartExtra * 60 ?? 0,
                     PostPaddingSeconds = entry.StopExtra * 60 ?? 0,
                     // IsPrePaddingRequired
@@ -242,6 +242,7 @@ public class LiveTvService(
                     RecordingPath = entry.Filename
                     // KeepUntil
                 });
+            }
 
             logger.LogInformation("GetTimers: Retrieved {Count} timers", timers.Count);
         }
@@ -389,7 +390,10 @@ public class LiveTvService(
 
             foreach (var entry in response.Entries)
             {
-                if (entry.StopDateTime <= startDateUtc || entry.StartDateTime >= endDateUtc) continue;
+                if (entry.StopDateTime <= startDateUtc || entry.StartDateTime >= endDateUtc)
+                {
+                    continue;
+                }
 
                 var imageInfo = ImageUtilities.GetImageInfo(entry.Image, appHost);
                 var program = new ProgramInfo
@@ -479,14 +483,12 @@ public class LiveTvService(
             foreach (var stream in streamsResponse.Fstreams)
             {
                 var codecType = stream.Type?.ToLowerInvariant();
-                if (string.IsNullOrEmpty(codecType)) continue;
-
-                var mediaStream = new MediaStream
+                if (string.IsNullOrEmpty(codecType))
                 {
-                    Index = stream.Index - 1 ?? -1,
-                    Codec = codecType,
-                    Language = stream.Language
-                };
+                    continue;
+                }
+
+                var mediaStream = new MediaStream { Index = stream.Index - 1 ?? -1, Codec = codecType, Language = stream.Language };
 
                 if (CodecTypes.VideoCodecs.Contains(codecType))
                 {
@@ -496,7 +498,9 @@ public class LiveTvService(
                     mediaStream.Height = stream.Height;
 
                     if (stream is { AspectNum: > 0, AspectDen: > 0 })
+                    {
                         mediaStream.AspectRatio = $"{stream.AspectNum}:{stream.AspectDen}";
+                    }
                 }
                 else if (CodecTypes.AudioCodecs.Contains(codecType))
                 {
@@ -526,23 +530,14 @@ public class LiveTvService(
         {
             logger.LogWarning("GetChannelStream: No video stream found. Adding fallback. (streamId: {StreamId})",
                 streamId);
-            mediaStreams.Add(new MediaStream
-            {
-                Type = MediaStreamType.Video,
-                Index = -1,
-                IsInterlaced = true
-            });
+            mediaStreams.Add(new MediaStream { Type = MediaStreamType.Video, Index = -1, IsInterlaced = true });
         }
 
         if (mediaStreams.All(m => m.Type != MediaStreamType.Audio))
         {
             logger.LogWarning("GetChannelStream: No audio stream found. Adding fallback. (streamId: {StreamId})",
                 streamId);
-            mediaStreams.Add(new MediaStream
-            {
-                Type = MediaStreamType.Audio,
-                Index = -1
-            });
+            mediaStreams.Add(new MediaStream { Type = MediaStreamType.Audio, Index = -1 });
         }
 
         logger.LogDebug("GetChannelStream: Requesting stream ticket (streamId: {StreamId})", streamId);
@@ -606,7 +601,10 @@ public class LiveTvService(
 
                 foreach (var service in services)
                 {
-                    if (string.IsNullOrEmpty(service)) continue;
+                    if (string.IsNullOrEmpty(service))
+                    {
+                        continue;
+                    }
 
                     var source = await GetChannelStream(channelId, service, cancellationToken).ConfigureAwait(false);
                     mediaSources.Add(source);
