@@ -54,7 +54,7 @@ public record DvrEventEntry
 
     [JsonPropertyName("retention")] public int? Retention { get; init; }
 
-    [JsonPropertyName("removal")] public int? Removal { get; init; }
+    [JsonPropertyName("removal")] public long? Removal { get; init; }
 
     [JsonPropertyName("playposition")] public int? PlayPosition { get; init; }
 

@@ -42,7 +42,7 @@ public record DvrAutorecUpdateRequest
 
     [JsonPropertyName("pri")] public int? Priority { get; set; }
 
-    [JsonPropertyName("removal")] public int? Removal { get; set; }
+    [JsonPropertyName("removal")] public long? Removal { get; set; }
 
     [JsonPropertyName("cat1")] public string? Cat1 { get; set; }
 
