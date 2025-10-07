@@ -32,7 +32,7 @@ public record DvrEntryUpdateRequest
 
     [JsonPropertyName("creator")] public string? Creator { get; init; }
 
-    [JsonPropertyName("removal")] public int? Removal { get; init; }
+    [JsonPropertyName("removal")] public long? Removal { get; init; }
 
     [JsonPropertyName("retention")] public int? Retention { get; init; }
 

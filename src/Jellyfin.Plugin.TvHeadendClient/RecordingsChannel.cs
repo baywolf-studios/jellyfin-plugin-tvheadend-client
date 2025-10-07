@@ -173,7 +173,7 @@ public class RecordingsChannel(
     }
 
     public string Name => "Recordings";
-    public string Description => "TVHeadend Recordings";
+    public string Description => "TvHeadend Recordings";
     public string DataVersion => PluginInfo.Version;
     public string HomePageUrl => PluginInfo.HomePageUrl;
     public ChannelParentalRating ParentalRating => ChannelParentalRating.GeneralAudience;

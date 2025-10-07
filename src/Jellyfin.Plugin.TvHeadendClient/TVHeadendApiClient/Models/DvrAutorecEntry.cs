@@ -24,7 +24,7 @@ public record DvrAutorecEntry
 
     [JsonPropertyName("maxduration")] public int? MaxDuration { get; init; }
 
-    [JsonPropertyName("removal")] public int? Removal { get; init; }
+    [JsonPropertyName("removal")] public long? Removal { get; init; }
 
     [JsonPropertyName("start_extra")] public int? StartExtra { get; init; }
 
