@@ -9,6 +9,14 @@
     "owner": "Bay Wolf Studios LLC",
     "versions": [
       {
+        "changelog": "<!-- Optional: add a release summary here -->\r\n## :sparkles: What's New\r\n\r\n* fix: Update DVREntry models to handle large Removal number (#19) @matthewpritchett\r\n",
+        "checksum": "3f778ebdde8866ba9a8dee426510a917",
+        "sourceUrl": "https://github.com/baywolf-studios/jellyfin-plugin-tvheadend-client/releases/download/v3/tvheadend-client_3.0.0.0.zip",
+        "targetAbi": "10.10.7.0",
+        "timestamp": "2025-10-07T18:37:19Z",
+        "version": "3.0.0.0"
+      },
+      {
         "changelog": "<!-- Optional: add a release summary here -->\r\n## :sparkles: What's New\r\n\r\n* Initial Release v2\r\n",
         "checksum": "f6525253d3520d0aac9ce17c9abc548e",
         "sourceUrl": "https://github.com/baywolf-studios/jellyfin-plugin-tvheadend-client/releases/download/v2/tvheadend-client_2.0.0.0.zip",
