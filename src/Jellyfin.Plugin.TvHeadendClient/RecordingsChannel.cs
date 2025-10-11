@@ -300,7 +300,7 @@ public class RecordingsChannel(
             Name = string.IsNullOrEmpty(dvrEventEntry.Subtitle) ? dvrEventEntry.Title : dvrEventEntry.Subtitle,
             SeriesName = string.IsNullOrEmpty(dvrEventEntry.Subtitle) ? null : dvrEventEntry.Title,
             Id = dvrEventEntry.Uuid,
-            DateModified = dvrEventEntry.StopDateTime ?? DateTime.UtcNow,
+            DateModified = DateTime.UtcNow,
             Type = ChannelItemType.Media,
             OfficialRating = dvrEventEntry.RatingLabel,
             Overview = dvrEventEntry.Description,
