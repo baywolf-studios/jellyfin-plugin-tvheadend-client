@@ -22,8 +22,7 @@ public class RecordingsChannel(
     IServerApplicationHost appHost,
     IMediaEncoder mediaEncoder,
     ITvHeadendApiClient tvHeadendApiClient)
-    : IChannel, IHasCacheKey, IRequiresMediaInfoCallback, IHasFolderAttributes, ISupportsDelete, ISupportsLatestMedia,
-        ISupportsMediaProbe
+    : IChannel, IHasCacheKey, IRequiresMediaInfoCallback, IHasFolderAttributes, ISupportsDelete, ISupportsLatestMedia
 {
     public InternalChannelFeatures GetChannelFeatures()
     {
@@ -274,8 +273,7 @@ public class RecordingsChannel(
             var allRecordings = upcomingRecordingsTask.Result.Entries.Concat(finishedRecordingsTask.Result.Entries);
             var playableRecordings = allRecordings.Where(r =>
                 !string.IsNullOrEmpty(r.Url) && r.SchedStatus is "completed" or "recording");
-            var latestRecordings = playableRecordings.OrderByDescending(r => r.StopDateTime);
-            return latestRecordings.Select(ConvertToChannelItem);
+            return playableRecordings.Select(ConvertToChannelItem).OrderByDescending(r => r.EndDate);
         }
         catch (Exception ex)
         {
