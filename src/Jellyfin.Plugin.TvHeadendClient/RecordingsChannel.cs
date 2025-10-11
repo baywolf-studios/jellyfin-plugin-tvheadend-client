@@ -310,7 +310,7 @@ public class RecordingsChannel(
             //People
             //CommunityRating
             RunTimeTicks = dvrEventEntry.Duration == null || isCurrentlyRecording
-                ? null
+                ? null 
                 : TimeSpan.FromSeconds((double)dvrEventEntry.Duration).Ticks,
             ImageUrl = imageInfo.ImageUrl,
             //OriginalTitle
