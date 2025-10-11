@@ -9,6 +9,14 @@
     "owner": "Bay Wolf Studios LLC",
     "versions": [
       {
+        "changelog": "<!-- Optional: add a release summary here -->\r\n## :sparkles: What's New\r\n\r\n* fix: make it update the duration when item is changed (#23) @matthewpritchett\r\n",
+        "checksum": "2f1c9a427f345d4ce8708dc079272276",
+        "sourceUrl": "https://github.com/baywolf-studios/jellyfin-plugin-tvheadend-client/releases/download/v5/tvheadend-client_5.0.0.0.zip",
+        "targetAbi": "10.10.7.0",
+        "timestamp": "2025-10-11T16:08:06Z",
+        "version": "5.0.0.0"
+      },
+      {
         "changelog": "<!-- Optional: add a release summary here -->\r\n## :sparkles: What's New\r\n\r\n* Update RecordingsChannel.cs (#21) @matthewpritchett\r\n",
         "checksum": "21077a1b852619311bcd5904b458db6f",
         "sourceUrl": "https://github.com/baywolf-studios/jellyfin-plugin-tvheadend-client/releases/download/v4/tvheadend-client_4.0.0.0.zip",
