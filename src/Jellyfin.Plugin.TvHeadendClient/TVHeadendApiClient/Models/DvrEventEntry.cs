@@ -22,6 +22,11 @@ public record DvrEventEntry
 
     [JsonPropertyName("start_real")] public long? StartReal { get; init; }
 
+    [JsonIgnore]
+    public DateTime? StartRealDateTime =>
+        StartReal.HasValue ? DateTimeOffset.FromUnixTimeSeconds(StartReal.Value).UtcDateTime : null;
+
+
     [JsonPropertyName("stop")] public long? Stop { get; init; }
 
     [JsonIgnore] public DateTime? StopDateTime => Stop.HasValue ? DateTimeOffset.FromUnixTimeSeconds(Stop.Value).UtcDateTime : null;
@@ -29,6 +34,9 @@ public record DvrEventEntry
     [JsonPropertyName("stop_extra")] public int? StopExtra { get; init; }
 
     [JsonPropertyName("stop_real")] public long? StopReal { get; init; }
+
+    [JsonIgnore] public DateTime? StopRealDateTime => StopReal.HasValue ? DateTimeOffset.FromUnixTimeSeconds(StopReal.Value).UtcDateTime : null;
+
 
     [JsonPropertyName("duration")] public int? Duration { get; init; }
 

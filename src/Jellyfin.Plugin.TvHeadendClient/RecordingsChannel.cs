@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Reflection;
 using Jellyfin.Plugin.TvHeadendClient.Helpers;
 using Jellyfin.Plugin.TvHeadendClient.TVHeadendApiClient;
 using Jellyfin.Plugin.TvHeadendClient.TVHeadendApiClient.Models;
@@ -155,12 +154,7 @@ public class RecordingsChannel(
     {
         if (type == ImageType.Primary)
         {
-            return Task.FromResult(new DynamicImageResponse
-            {
-                Path = "https://raw.githubusercontent.com/baywolf-studios/jellyfin-plugin-tvheadend-client/main/images/recordings-channel.png",
-                Protocol = MediaProtocol.Http,
-                HasImage = true
-            });
+            return Task.FromResult(new DynamicImageResponse { Path = "https://raw.githubusercontent.com/baywolf-studios/jellyfin-plugin-tvheadend-client/main/images/recordings-channel.png", Protocol = MediaProtocol.Http, HasImage = true });
         }
 
         return Task.FromResult(new DynamicImageResponse { HasImage = false });
@@ -213,9 +207,10 @@ public class RecordingsChannel(
 
         try
         {
-            var calculatedMediaSourceInfo = await mediaEncoder.GetMediaInfo(
+            var calculatedMediaSourceInfoTask = mediaEncoder.GetMediaInfo(
                 new MediaInfoRequest { ExtractChapters = false, MediaSource = mediaSourceInfo, MediaType = DlnaProfileType.Video },
                 cancellationToken);
+            var calculatedMediaSourceInfo = await calculatedMediaSourceInfoTask.WaitAsync(TimeSpan.FromSeconds(5), cancellationToken);
             mediaSourceInfo.MediaStreams = calculatedMediaSourceInfo.MediaStreams;
         }
         catch (Exception ex)
@@ -298,7 +293,7 @@ public class RecordingsChannel(
             Name = string.IsNullOrEmpty(dvrEventEntry.Subtitle) ? dvrEventEntry.Title : dvrEventEntry.Subtitle,
             SeriesName = string.IsNullOrEmpty(dvrEventEntry.Subtitle) ? null : dvrEventEntry.Title,
             Id = dvrEventEntry.Uuid,
-            DateModified = DateTime.UtcNow,
+            DateModified = isCurrentlyRecording ? DateTime.UtcNow : dvrEventEntry.StopRealDateTime ?? DateTime.UtcNow,
             Type = ChannelItemType.Media,
             OfficialRating = dvrEventEntry.RatingLabel,
             Overview = dvrEventEntry.Description,
@@ -320,9 +315,9 @@ public class RecordingsChannel(
             //ProviderIds
             PremiereDate = dvrEventEntry.FirstAiredDateTime,
             ProductionYear = dvrEventEntry.CopyrightYear,
-            DateCreated = dvrEventEntry.StartDateTime,
-            StartDate = dvrEventEntry.StartDateTime,
-            EndDate = dvrEventEntry.StopDateTime,
+            DateCreated = dvrEventEntry.StartRealDateTime,
+            StartDate = dvrEventEntry.StartRealDateTime,
+            EndDate = dvrEventEntry.StopRealDateTime,
             //IndexNumber
             //ParentIndexNumber
             //MediaSources = [],

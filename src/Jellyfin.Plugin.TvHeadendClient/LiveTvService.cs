@@ -201,8 +201,8 @@ public class LiveTvService(
                     Name = entry.Title,
                     Overview = entry.Description,
                     // SeriesId
-                    StartDate = entry.StartDateTime ?? DateTime.UtcNow,
-                    EndDate = entry.StopDateTime ?? DateTime.UtcNow.AddHours(1),
+                    StartDate = entry.StartRealDateTime ?? DateTime.UtcNow,
+                    EndDate = entry.StopRealDateTime ?? DateTime.UtcNow.AddHours(1),
                     Status = entry.SchedStatus switch
                     {
                         "scheduled" => RecordingStatus.New,
