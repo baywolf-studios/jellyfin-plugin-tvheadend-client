@@ -14,4 +14,4 @@ owner: "Bay Wolf Studios LLC"
 artifacts:
   - "Jellyfin.Plugin.TvHeadendClient.dll"
 changelog: |-
-  - fix: timeout for ffprobe, DateModified less often unless recording (#25) @matthewpritchett
+  - chore: Update for Jellyfin 10.11.0 (#27) @matthewpritchett
