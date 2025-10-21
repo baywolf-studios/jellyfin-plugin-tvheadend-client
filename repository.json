@@ -9,6 +9,14 @@
     "owner": "Bay Wolf Studios LLC",
     "versions": [
       {
+        "changelog": "<!-- Optional: add a release summary here -->\r\n## :sparkles: What's New\r\n\r\n* chore: Update for Jellyfin 10.11.0 (#27) @matthewpritchett\r\n",
+        "checksum": "3536ca340424d0c3b3ab22eb7a992779",
+        "sourceUrl": "https://github.com/baywolf-studios/jellyfin-plugin-tvheadend-client/releases/download/v7/tvheadend-client_7.0.0.0.zip",
+        "targetAbi": "10.11.0.0",
+        "timestamp": "2025-10-21T17:36:48Z",
+        "version": "7.0.0.0"
+      },
+      {
         "changelog": "<!-- Optional: add a release summary here -->\r\n## :sparkles: What's New\r\n\r\n* fix: timeout for ffprobe, DateModified less often unless recording (#25) @matthewpritchett\r\n",
         "checksum": "9f52083b1ccebb9b0a61e9fb63537d0c",
         "sourceUrl": "https://github.com/baywolf-studios/jellyfin-plugin-tvheadend-client/releases/download/v6/tvheadend-client_6.0.0.0.zip",
