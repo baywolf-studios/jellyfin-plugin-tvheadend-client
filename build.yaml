@@ -2,7 +2,7 @@
 name: "TvHeadend Client"
 guid: "d2762daa-c6a2-4ede-b513-36b09a9f1752"
 imageUrl: "https://raw.githubusercontent.com/baywolf-studios/jellyfin-plugin-tvheadend-client/main/images/jellyfin-plugin-tvheadend-client.png"
-version: "7.0.0.0"
+version: "8.0.0.0"
 targetAbi: "10.11.0.0"
 framework: "net9.0"
 overview: "A plugin that brings TvHeadend's Live TV and DVR capabilities into Jellyfin."
@@ -14,4 +14,4 @@ owner: "Bay Wolf Studios LLC"
 artifacts:
   - "Jellyfin.Plugin.TvHeadendClient.dll"
 changelog: |-
-  - chore: Update for Jellyfin 10.11.0 (#27) @matthewpritchett
+  - feat: Added ability to allow fMP4 transcoding container (#29) @matthewpritchett
