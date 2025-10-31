@@ -560,7 +560,7 @@ public class LiveTvService(
                 IsInfiniteStream = true,
                 BufferMs = 500,
                 FallbackMaxStreamingBitrate = 30000000,
-                UseMostCompatibleTranscodingProfile = true,
+                UseMostCompatibleTranscodingProfile = !Plugin.Instance.Configuration.AllowFmp4TranscodingContainer,
                 MediaStreams = mediaStreams
             };
         }
