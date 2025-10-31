@@ -9,6 +9,14 @@
     "owner": "Bay Wolf Studios LLC",
     "versions": [
       {
+        "changelog": "<!-- Optional: add a release summary here -->\r\n## :sparkles: What's New\r\n\r\n* feat: Added ability to allow fMP4 transcoding container (#29) @matthewpritchett\r\n",
+        "checksum": "b04e5f269d2fbbeac757e1557b46d667",
+        "sourceUrl": "https://github.com/baywolf-studios/jellyfin-plugin-tvheadend-client/releases/download/v8/tvheadend-client_8.0.0.0.zip",
+        "targetAbi": "10.11.0.0",
+        "timestamp": "2025-10-31T22:35:36Z",
+        "version": "8.0.0.0"
+      },
+      {
         "changelog": "<!-- Optional: add a release summary here -->\r\n## :sparkles: What's New\r\n\r\n* chore: Update for Jellyfin 10.11.0 (#27) @matthewpritchett\r\n",
         "checksum": "3536ca340424d0c3b3ab22eb7a992779",
         "sourceUrl": "https://github.com/baywolf-studios/jellyfin-plugin-tvheadend-client/releases/download/v7/tvheadend-client_7.0.0.0.zip",
