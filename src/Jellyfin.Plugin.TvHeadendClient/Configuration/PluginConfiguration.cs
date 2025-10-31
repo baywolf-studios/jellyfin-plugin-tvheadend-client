@@ -13,6 +13,7 @@ public class PluginConfiguration : BasePluginConfiguration
         Password = string.Empty;
         HideRecordingsChannel = false;
         ForceAllProgramsAsSeries = false;
+        AllowFmp4TranscodingContainer = false;
     }
 
     public string Host { get; set; }
@@ -22,4 +23,5 @@ public class PluginConfiguration : BasePluginConfiguration
     public string Password { get; set; }
     public bool HideRecordingsChannel { get; set; }
     public bool ForceAllProgramsAsSeries { get; set; }
+    public bool AllowFmp4TranscodingContainer { get; set; }
 }

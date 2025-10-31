@@ -53,6 +53,14 @@
                     </label>
                     <div class="fieldDescription">Treats all programs as series so Jellyfin can create TvHeadend autorecs, even if series info is missing in the EPG.</div>
                 </div>
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                    <label class="emby-checkbox-label">
+                        <input id="AllowFmp4TranscodingContainerSetting" is="emby-checkbox" name="AllowFmp4TranscodingContainerCheckBox"
+                               type="checkbox"/>
+                        <span>Allow fMP4 transcoding container</span>
+                    </label>
+                    <div class="fieldDescription">Allow fMP4 transcoding container to enable HEVC and HDR contents. Not all streams are compatible with this container. Disable this if you experience playback issues.</div>
+                </div>
                 <div>
                     <button class="raised button-submit block emby-button" is="emby-button" type="submit">
                         <span>Save</span>
@@ -77,6 +85,7 @@
                     document.querySelector('#Password').value = config.Password;
                     document.querySelector('#HideRecordingsChannelSetting').checked = config.HideRecordingsChannel;
                     document.querySelector('#ForceAllProgramsAsSeriesSetting').checked = config.ForceAllProgramsAsSeries;
+                    document.querySelector('#AllowFmp4TranscodingContainerSetting').checked = config.AllowFmp4TranscodingContainer;
                     Dashboard.hideLoadingMsg();
                 });
             });
@@ -92,6 +101,7 @@
                     config.Password = document.querySelector('#Password').value;
                     config.HideRecordingsChannel = document.querySelector('#HideRecordingsChannelSetting').checked;
                     config.ForceAllProgramsAsSeries = document.querySelector('#ForceAllProgramsAsSeriesSetting').checked;
+                    config.AllowFmp4TranscodingContainer = document.querySelector('#AllowFmp4TranscodingContainerSetting').checked;
                     ApiClient.updatePluginConfiguration(TvHeadendClientConfig.pluginUniqueId, config).then(function (result) {
                         Dashboard.processPluginConfigurationUpdateResult(result);
                     });
