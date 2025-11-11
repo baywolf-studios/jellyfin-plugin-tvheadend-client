@@ -29,7 +29,7 @@ public class LiveTvService(
                 .GetChannelGridAsync(Plugin.ConnectionInfo, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
-            foreach (var entry in response.Entries)
+            foreach (var entry in response.Entries.Where(e => e.Enabled == true))
             {
                 var imageInfo = ImageUtilities.GetImageInfo(entry.IconPublicUrl, appHost);
                 channels.Add(new ChannelInfo
@@ -186,7 +186,7 @@ public class LiveTvService(
                 .GetDvrEventGridAsync(Plugin.ConnectionInfo, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
-            foreach (var entry in response.Entries)
+            foreach (var entry in response.Entries.Where(e => e.Enabled == true))
             {
                 timers.Add(new TimerInfo
                 {
@@ -267,7 +267,7 @@ public class LiveTvService(
                 .GetDvrConfigGridAsync(Plugin.ConnectionInfo, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
-            var recordingProfiles = response.Entries;
+            var recordingProfiles = response.Entries.Where(e => e.Enabled == true).ToList();
 
             var defaultRecordingProfile =
                 recordingProfiles.FirstOrDefault(r => r.Name == string.Empty && (r.Enabled ?? false)) ??
@@ -323,7 +323,7 @@ public class LiveTvService(
                 .GetDvrAutorecGridAsync(Plugin.ConnectionInfo, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
-            foreach (var entry in response.Entries)
+            foreach (var entry in response.Entries.Where(e => e.Enabled == true))
             {
                 var channelId = entry.Channel;
 
