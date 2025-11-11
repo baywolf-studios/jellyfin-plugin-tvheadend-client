@@ -42,7 +42,7 @@ public class LiveTvService(
                 });
             }
 
-            logger.LogInformation("GetChannels: Retrieved {Count} channels.", channels.Count);
+            logger.LogDebug("GetChannels: Retrieved {Count} channels.", channels.Count);
         }
         catch (Exception ex)
         {
@@ -244,7 +244,7 @@ public class LiveTvService(
                 });
             }
 
-            logger.LogInformation("GetTimers: Retrieved {Count} timers", timers.Count);
+            logger.LogDebug("GetTimers: Retrieved {Count} timers", timers.Count);
         }
         catch (Exception ex)
         {
@@ -358,7 +358,7 @@ public class LiveTvService(
                 });
             }
 
-            logger.LogInformation("GetSeriesTimers: Retrieved {Count} series timers", timers.Count);
+            logger.LogDebug("GetSeriesTimers: Retrieved {Count} series timers", timers.Count);
         }
         catch (Exception ex)
         {
@@ -443,7 +443,7 @@ public class LiveTvService(
                 programs.Add(program);
             }
 
-            logger.LogInformation("GetPrograms: Retrieved {Count} programs for channel {ChannelId}", programs.Count,
+            logger.LogDebug("GetPrograms: Retrieved {Count} programs for channel {ChannelId}", programs.Count,
                 channelId);
         }
         catch (Exception ex)
@@ -547,7 +547,7 @@ public class LiveTvService(
             var streamUrl = await tvHeadendApiClient.GetPlayUrlForStreamService(Plugin.ConnectionInfo,
                 streamId, cancellationToken);
 
-            logger.LogInformation("GetChannelStream: Stream path retrieved successfully (streamId: {StreamId})",
+            logger.LogDebug("GetChannelStream: Stream path retrieved successfully (streamId: {StreamId})",
                 streamId);
 
             return new MediaSourceInfo
@@ -610,7 +610,7 @@ public class LiveTvService(
                     mediaSources.Add(source);
                 }
 
-                logger.LogInformation(
+                logger.LogDebug(
                     "GetChannelStreamMediaSources: Retrieved {MediaSourceCount} media source(s) for channel '{ChannelId}'",
                     mediaSources.Count, channelId);
             }

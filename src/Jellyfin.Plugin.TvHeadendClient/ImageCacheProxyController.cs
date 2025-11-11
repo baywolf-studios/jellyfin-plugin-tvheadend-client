@@ -17,7 +17,7 @@ public class ImageCacheProxyController(
     [HttpGet("{id}")]
     public async Task<ActionResult> ProxyImageCacheRequest([FromRoute] [Required] int id)
     {
-        logger.LogInformation("ProxyImageCacheRequest: Request received for id {Id}", id);
+        logger.LogDebug("ProxyImageCacheRequest: Request received for id {Id}", id);
 
         try
         {
@@ -41,11 +41,13 @@ public class ImageCacheProxyController(
         }
         catch (HttpRequestException ex) when (ex.StatusCode.HasValue)
         {
+            logger.LogError(ex, "ProxyImageCacheRequest: HTTP error {StatusCode} from TvHeadend while fetching id {Id}",
+                ex.StatusCode.Value, id);
             return Problem(statusCode: (int)ex.StatusCode.Value);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Unexpected error while proxying image request for id {Id}", id);
+            logger.LogError(ex, "ProxyImageCacheRequest: Unexpected error while proxying image request for id {Id}", id);
             return Problem();
         }
     }
