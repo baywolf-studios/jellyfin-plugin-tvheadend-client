@@ -49,7 +49,7 @@ public class RecordingsChannel(
     public async Task<ChannelItemResult> GetChannelItems(InternalChannelItemQuery query,
         CancellationToken cancellationToken)
     {
-        logger.LogInformation("GetChannelItems: Getting recording items");
+        logger.LogDebug("GetChannelItems: Getting recording items");
 
         var result = new ChannelItemResult();
         var channelItems = new List<ChannelItemInfo>();
@@ -139,6 +139,7 @@ public class RecordingsChannel(
                 }
             }
 
+            logger.LogDebug("GetChannelItems: Retrieved {Count} items", channelItems.Count);
             result.Items = channelItems;
         }
         catch (Exception ex)
@@ -181,7 +182,7 @@ public class RecordingsChannel(
     public async Task<IEnumerable<MediaSourceInfo>> GetChannelItemMediaInfo(string id,
         CancellationToken cancellationToken)
     {
-        logger.LogInformation("GetChannelItemMediaInfo: Generating MediaInfo for {Id}", id);
+        logger.LogDebug("GetChannelItemMediaInfo: Generating MediaInfo for {Id}", id);
 
         var playbackUrl =
             await tvHeadendApiClient.GetPlayUrlForDvrFile(Plugin.ConnectionInfo, id,
@@ -251,7 +252,7 @@ public class RecordingsChannel(
     public async Task<IEnumerable<ChannelItemInfo>> GetLatestMedia(ChannelLatestMediaSearch request,
         CancellationToken cancellationToken)
     {
-        logger.LogInformation("GetLatestMedia: Getting latest recording items");
+        logger.LogDebug("GetLatestMedia: Getting latest recording items");
 
         try
         {
@@ -267,12 +268,15 @@ public class RecordingsChannel(
 
             var allRecordings = upcomingRecordingsTask.Result.Entries.Concat(finishedRecordingsTask.Result.Entries);
             var playableRecordings = allRecordings.Where(r =>
-                !string.IsNullOrEmpty(r.Url) && r.SchedStatus is "completed" or "recording");
+                !string.IsNullOrEmpty(r.Url) && r.SchedStatus is "completed" or "recording").ToList();
+
+            logger.LogDebug("GetLatestMedia: Retrieved {Count} playable recordings", playableRecordings.Count);
+
             return playableRecordings.Select(ConvertToChannelItem).OrderByDescending(r => r.EndDate);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "GetChannelItems: Failed to get channel items");
+            logger.LogError(ex, "GetLatestMedia: Failed to get latest recording items");
             throw;
         }
     }
@@ -284,7 +288,7 @@ public class RecordingsChannel(
             return new ChannelItemInfo();
         }
 
-        logger.LogInformation("ConvertToChannelItem: {id}", dvrEventEntry.Uuid);
+        logger.LogDebug("ConvertToChannelItem: {id}", dvrEventEntry.Uuid);
 
         var isCurrentlyRecording = dvrEventEntry.SchedStatus == "recording";
         var imageInfo = ImageUtilities.GetImageInfo(dvrEventEntry.Image, appHost);

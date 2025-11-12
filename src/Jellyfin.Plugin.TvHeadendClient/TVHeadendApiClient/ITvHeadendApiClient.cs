@@ -51,9 +51,6 @@ public interface ITvHeadendApiClient
     Task<string> GetPlayUrlForDvrFile(DigestConnectionInfo connectionInfo, string dvrFileId,
         CancellationToken cancellationToken = default);
 
-    Task<EpgEventsLoadResponse> GetEpgEventsLoadAsync(DigestConnectionInfo connectionInfo, string eventId,
-        CancellationToken cancellationToken = default);
-
     Task<byte[]?> GetImageAsync(DigestConnectionInfo connectionInfo, string url,
         CancellationToken cancellationToken = default);
 

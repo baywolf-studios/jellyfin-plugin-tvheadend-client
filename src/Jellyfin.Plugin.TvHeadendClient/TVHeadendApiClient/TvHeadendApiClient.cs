@@ -241,20 +241,6 @@ public partial class TvHeadendApiClient(IHttpClientFactory httpClientFactory) : 
         return streamPathMatch.Value;
     }
 
-    public async Task<EpgEventsLoadResponse> GetEpgEventsLoadAsync(DigestConnectionInfo connectionInfo, string eventId,
-        CancellationToken cancellationToken)
-    {
-        var httpClient = httpClientFactory.CreateClient(nameof(TvHeadendApiClient));
-        httpClient.BaseAddress = connectionInfo.BaseUri;
-
-        var url = $"api/epg/events/load?eventId={eventId}";
-
-        return await httpClient.GetAndReadAsJsonWithDigestAuthAsync<EpgEventsLoadResponse>(url, connectionInfo.Username,
-                   connectionInfo.Password,
-                   cancellationToken) ??
-               new EpgEventsLoadResponse();
-    }
-
     public async Task UpdateDvrEntryAsync(DigestConnectionInfo connectionInfo,
         DvrEntryUpdateRequest dvrEntryCreateRequest,
         CancellationToken cancellationToken)
