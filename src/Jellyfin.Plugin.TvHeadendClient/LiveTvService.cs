@@ -206,12 +206,21 @@ public class LiveTvService(
                     Status = entry.SchedStatus switch
                     {
                         "scheduled" => RecordingStatus.New,
+                    
                         "recording" => RecordingStatus.InProgress,
+                        "recordingError" => RecordingStatus.InProgress,
+                    
                         "completed" => RecordingStatus.Completed,
+                        "completedWarning" => RecordingStatus.Completed,
+                        "completedRerecord" => RecordingStatus.Completed,
+                    
                         "completedError" => RecordingStatus.Error,
+                    
                         "cancelled" => RecordingStatus.Cancelled,
+                    
                         "conflictedOk" => RecordingStatus.ConflictedOk,
                         "conflictedNotOk" => RecordingStatus.ConflictedNotOk,
+                    
                         _ => RecordingStatus.Error
                     },
                     PrePaddingSeconds = entry.StartExtra * 60 ?? 0,
@@ -703,7 +712,7 @@ public class LiveTvService(
 
     public async Task<string> CreateSeriesTimer(SeriesTimerInfo info, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(info.ChannelId))
+        if (!info.RecordAnyChannel && string.IsNullOrWhiteSpace(info.ChannelId))
         {
             logger.LogWarning("CreateSeriesTimer: ChannelId is null or empty.");
             throw new ArgumentException("Channel ID cannot be null or empty.", nameof(info));
