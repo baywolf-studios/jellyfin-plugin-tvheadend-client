@@ -23,6 +23,15 @@ public class RecordingsChannel(
     ITvHeadendApiClient tvHeadendApiClient)
     : IChannel, IHasCacheKey, IRequiresMediaInfoCallback, IHasFolderAttributes, ISupportsDelete, ISupportsLatestMedia
 {
+    private static readonly HashSet<string> PlayableStatuses =
+    [
+        "completed",
+        "completedWarning",
+        "completedRerecord",
+        "completedError",
+        "recording"
+    ];
+    
     public InternalChannelFeatures GetChannelFeatures()
     {
         return new InternalChannelFeatures
@@ -73,8 +82,9 @@ public class RecordingsChannel(
 
             var allDvrEvents = upcomingDvrEventsTask.Result.Entries.Concat(finishedDvrEventsTask.Result.Entries);
             var playableDvrEvents = allDvrEvents.Where(r =>
-                !string.IsNullOrEmpty(r.Filename) && !string.IsNullOrEmpty(r.Url) &&
-                r.SchedStatus is "completed" or "recording");
+                !string.IsNullOrEmpty(r.Filename) &&
+                !string.IsNullOrEmpty(r.Url) &&
+                PlayableStatuses.Contains(r.SchedStatus ?? string.Empty));
             var dvrEventsWithData = playableDvrEvents.Select(dvrEvent =>
             {
                 var uriPath = dvrEvent.Filename;
@@ -268,7 +278,8 @@ public class RecordingsChannel(
 
             var allRecordings = upcomingRecordingsTask.Result.Entries.Concat(finishedRecordingsTask.Result.Entries);
             var playableRecordings = allRecordings.Where(r =>
-                !string.IsNullOrEmpty(r.Url) && r.SchedStatus is "completed" or "recording").ToList();
+                !string.IsNullOrEmpty(r.Url) &&
+                PlayableStatuses.Contains(r.SchedStatus ?? string.Empty)).ToList();
 
             logger.LogDebug("GetLatestMedia: Retrieved {Count} playable recordings", playableRecordings.Count);
 
