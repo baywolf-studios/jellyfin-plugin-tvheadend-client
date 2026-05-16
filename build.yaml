@@ -2,8 +2,8 @@
 name: "TvHeadend Client"
 guid: "d2762daa-c6a2-4ede-b513-36b09a9f1752"
 imageUrl: "https://raw.githubusercontent.com/baywolf-studios/jellyfin-plugin-tvheadend-client/main/images/jellyfin-plugin-tvheadend-client.png"
-version: "9.0.0.0"
-targetAbi: "10.11.2.0"
+version: 10
+targetAbi: "10.11.8.0"
 framework: "net9.0"
 overview: "A plugin that brings TvHeadend's Live TV and DVR capabilities into Jellyfin."
 description: >
@@ -14,4 +14,4 @@ owner: "Bay Wolf Studios LLC"
 artifacts:
   - "Jellyfin.Plugin.TvHeadendClient.dll"
 changelog: |-
-  - Cleanup (#33) @matthewpritchett
+  - Recordings fixes (#35) @matthewpritchett
