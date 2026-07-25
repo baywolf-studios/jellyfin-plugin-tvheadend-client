@@ -63,4 +63,7 @@ public record DvrEventEntry
             : null;
 
     [JsonPropertyName("rating_label")] public string? RatingLabel { get; init; }
+
+    [JsonPropertyName("episode_disp")]
+    public string? EpisodeDisplay { get; init; }
 }

@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text.RegularExpressions;
 using Jellyfin.Plugin.TvHeadendClient.Helpers;
 using Jellyfin.Plugin.TvHeadendClient.TVHeadendApiClient;
 using Jellyfin.Plugin.TvHeadendClient.TVHeadendApiClient.Models;
@@ -16,14 +17,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.TvHeadendClient;
 
-public class RecordingsChannel(
+public partial class RecordingsChannel(
     ILogger<RecordingsChannel> logger,
     IServerApplicationHost appHost,
     IMediaEncoder mediaEncoder,
     ITvHeadendApiClient tvHeadendApiClient)
     : IChannel, IHasCacheKey, IRequiresMediaInfoCallback, IHasFolderAttributes, ISupportsDelete, ISupportsLatestMedia
 {
-    private static readonly HashSet<string> PlayableStatuses =
+    private static readonly HashSet<string> _playableStatuses =
     [
         "completed",
         "completedWarning",
@@ -31,7 +32,7 @@ public class RecordingsChannel(
         "completedError",
         "recording"
     ];
-    
+
     public InternalChannelFeatures GetChannelFeatures()
     {
         return new InternalChannelFeatures
@@ -66,8 +67,6 @@ public class RecordingsChannel(
         try
         {
             var connectionInfo = Plugin.ConnectionInfo;
-            var dvrConfigsTask = tvHeadendApiClient.GetDvrConfigGridAsync(connectionInfo,
-                cancellationToken: cancellationToken);
             var upcomingDvrEventsTask = tvHeadendApiClient.GetDvrEventGridUpcomingAsync(
                 connectionInfo,
                 cancellationToken: cancellationToken);
@@ -75,78 +74,84 @@ public class RecordingsChannel(
                 connectionInfo,
                 cancellationToken: cancellationToken);
 
-            await Task.WhenAll(dvrConfigsTask, upcomingDvrEventsTask, finishedDvrEventsTask);
-
-            var dvrConfigs =
-                dvrConfigsTask.Result.Entries.ToDictionary(c => c.Uuid ?? Guid.NewGuid().ToString(), c => c);
+            await Task.WhenAll(upcomingDvrEventsTask, finishedDvrEventsTask);
 
             var allDvrEvents = upcomingDvrEventsTask.Result.Entries.Concat(finishedDvrEventsTask.Result.Entries);
-            var playableDvrEvents = allDvrEvents.Where(r =>
-                !string.IsNullOrEmpty(r.Filename) &&
-                !string.IsNullOrEmpty(r.Url) &&
-                PlayableStatuses.Contains(r.SchedStatus ?? string.Empty));
-            var dvrEventsWithData = playableDvrEvents.Select(dvrEvent =>
+            var playableDvrEvents = allDvrEvents
+                .Where(r =>
+                    !string.IsNullOrEmpty(r.Filename) &&
+                    !string.IsNullOrEmpty(r.Url) &&
+                    _playableStatuses.Contains(r.SchedStatus ?? string.Empty))
+                .Select(r =>
+                {
+                    var (isMovie, season, episode) = GetSeasonEpisode(r);
+
+                    return new { Recording = r, IsMovie = isMovie, Season = season, Episode = episode };
+                }).ToList();
+
+            if (string.IsNullOrWhiteSpace(query.FolderId))
             {
-                var uriPath = dvrEvent.Filename;
-                if (!string.IsNullOrEmpty(dvrEvent.Filename)
-                    && dvrConfigs.TryGetValue(dvrEvent.ConfigName ?? Guid.NewGuid().ToString(), out var dvrConfig)
-                    && !string.IsNullOrEmpty(dvrConfig.Storage)
-                    && dvrEvent.Filename.StartsWith(dvrConfig.Storage))
-                {
-                    uriPath = dvrEvent.Filename.Substring(dvrConfig.Storage.Length - 1);
-                }
+                var movies = playableDvrEvents
+                    .Where(e => e.IsMovie)
+                    .Select(e => ConvertToChannelItem(e.Recording));
 
-#pragma warning disable CS8604 // Possible null reference argument.
-                return (Uri: new Uri(uriPath), DvrEvent: dvrEvent);
-#pragma warning restore CS8604 // Possible null reference argument.
-            }).ToList();
-
-            var currentFolderDepth = 1;
-            var currentFolderPathPrefix = string.Empty;
-            if (!string.IsNullOrEmpty(query.FolderId))
-            {
-                var queryFolderUri = new Uri(Uri.UnescapeDataString(query.FolderId));
-                currentFolderDepth = queryFolderUri.Segments.Length;
-                currentFolderPathPrefix = query.FolderId;
-            }
-
-            var itemSegmentDepth = currentFolderDepth + 1;
-
-            var addedFolderIds = new HashSet<string>();
-
-            foreach (var dvrEvent in dvrEventsWithData)
-            {
-                if (!dvrEvent.Uri.AbsolutePath.StartsWith(currentFolderPathPrefix))
-                {
-                    continue;
-                }
-
-                if (dvrEvent.Uri.Segments.Length == itemSegmentDepth)
-                {
-                    channelItems.Add(ConvertToChannelItem(dvrEvent.DvrEvent));
-                }
-                else if (dvrEvent.Uri.Segments.Length > itemSegmentDepth)
-                {
-                    var nextFolderSegments = dvrEvent.Uri.Segments.Take(itemSegmentDepth);
-                    var nextFolderUriPath = string.Concat(nextFolderSegments);
-                    var decodedFolderUriPath = Uri.UnescapeDataString(nextFolderUriPath);
-                    var nextFolderUri = new Uri(decodedFolderUriPath);
-                    var nextFolderId = nextFolderUri.AbsolutePath;
-                    var nextFolderTitle = Uri.UnescapeDataString(nextFolderUri.Segments.Last()).TrimEnd('/');
-
-                    if (addedFolderIds.Add(nextFolderId))
-                    {
-                        var imageInfo = ImageUtilities.GetImageInfo(dvrEvent.DvrEvent.Image, appHost);
-                        channelItems.Add(new ChannelItemInfo
+                var series = playableDvrEvents
+                    .Where(e => !e.IsMovie)
+                    .GroupBy(e => e.Recording.Title ?? string.Empty)
+                    .Select(s =>
+                        new ChannelItemInfo
                         {
-                            Name = nextFolderTitle,
-                            FolderType = ChannelFolderType.Container,
-                            Id = nextFolderId,
+                            Name = s.Key,
+                            Id = $"series:{Uri.EscapeDataString(s.Key)}",
                             Type = ChannelItemType.Folder,
-                            ImageUrl = imageInfo.ImageUrl
-                        });
-                    }
-                }
+                            FolderType = ChannelFolderType.Series,
+                            ContentType = ChannelMediaContentType.Episode,
+                            ImageUrl = ImageUtilities
+                                .GetImageInfo(s.First().Recording.Image, appHost)
+                                .ImageUrl
+                        }
+                    );
+
+                var rootItems = movies.Concat(series).OrderBy(c => c.Name, StringComparer.OrdinalIgnoreCase);
+
+                channelItems.AddRange(rootItems);
+            }
+            else if (query.FolderId.StartsWith("series:", StringComparison.Ordinal))
+            {
+                var seriesName = Uri.UnescapeDataString(query.FolderId["series:".Length..]);
+
+                var seasons = playableDvrEvents
+                    .Where(e => e.Recording.Title == seriesName && e.Season.HasValue)
+                    .DistinctBy(e => e.Season)
+                    .OrderBy(e => e.Season)
+                    .Select(e =>
+                        new ChannelItemInfo
+                        {
+                            Name = $"Season {e.Season}",
+                            Id = $"season:{Uri.EscapeDataString(seriesName)}:{e.Season}",
+                            Type = ChannelItemType.Folder,
+                            FolderType = ChannelFolderType.Season,
+                            ContentType = ChannelMediaContentType.Episode,
+                            ImageUrl = ImageUtilities
+                                .GetImageInfo(e.Recording.Image, appHost)
+                                .ImageUrl
+                        }
+                    );
+
+                channelItems.AddRange(seasons);
+            }
+            else if (query.FolderId.StartsWith("season:", StringComparison.Ordinal))
+            {
+                var parts = query.FolderId.Split(':', 3);
+
+                var seriesName = Uri.UnescapeDataString(parts[1]);
+                var season = int.Parse(parts[2], CultureInfo.InvariantCulture);
+
+                var episodes = playableDvrEvents
+                    .Where(e => e.Recording.Title == seriesName && e.Season == season)
+                    .OrderBy(e => e.Episode)
+                    .Select(e => ConvertToChannelItem(e.Recording));
+                channelItems.AddRange(episodes);
             }
 
             logger.LogDebug("GetChannelItems: Retrieved {Count} items", channelItems.Count);
@@ -184,7 +189,7 @@ public class RecordingsChannel(
 
     public string GetCacheKey(string? userId)
     {
-        return string.Join('-', PluginInfo.Name, userId, DateTime.UtcNow.Ticks.ToString(CultureInfo.InvariantCulture));
+        return string.Join('-', PluginInfo.Name, userId, DateTime.UtcNow.ToString("yyyyMMddHHmm", CultureInfo.InvariantCulture));
     }
 
     public string[] Attributes => ["Recordings"];
@@ -279,7 +284,7 @@ public class RecordingsChannel(
             var allRecordings = upcomingRecordingsTask.Result.Entries.Concat(finishedRecordingsTask.Result.Entries);
             var playableRecordings = allRecordings.Where(r =>
                 !string.IsNullOrEmpty(r.Url) &&
-                PlayableStatuses.Contains(r.SchedStatus ?? string.Empty)).ToList();
+                _playableStatuses.Contains(r.SchedStatus ?? string.Empty)).ToList();
 
             logger.LogDebug("GetLatestMedia: Retrieved {Count} playable recordings", playableRecordings.Count);
 
@@ -303,10 +308,11 @@ public class RecordingsChannel(
 
         var isCurrentlyRecording = dvrEventEntry.SchedStatus == "recording";
         var imageInfo = ImageUtilities.GetImageInfo(dvrEventEntry.Image, appHost);
+        var (isMovie, season, episode) = GetSeasonEpisode(dvrEventEntry);
         var channelItem = new ChannelItemInfo
         {
-            Name = string.IsNullOrEmpty(dvrEventEntry.Subtitle) ? dvrEventEntry.Title : dvrEventEntry.Subtitle,
-            SeriesName = string.IsNullOrEmpty(dvrEventEntry.Subtitle) ? null : dvrEventEntry.Title,
+            Name = isMovie ? dvrEventEntry.Title : dvrEventEntry.Subtitle,
+            SeriesName = isMovie ? null : dvrEventEntry.Title,
             Id = dvrEventEntry.Uuid,
             DateModified = isCurrentlyRecording ? DateTime.UtcNow : dvrEventEntry.StopRealDateTime ?? DateTime.UtcNow,
             Type = ChannelItemType.Media,
@@ -324,7 +330,7 @@ public class RecordingsChannel(
             //OriginalTitle
             MediaType = ChannelMediaType.Video,
             //FolderType
-            ContentType = ChannelMediaContentType.Clip,
+            ContentType = isMovie ? ChannelMediaContentType.Movie : ChannelMediaContentType.Episode,
             //ExtraType
             //TrailerTypes
             //ProviderIds
@@ -333,8 +339,8 @@ public class RecordingsChannel(
             DateCreated = dvrEventEntry.StartRealDateTime,
             StartDate = dvrEventEntry.StartRealDateTime,
             EndDate = dvrEventEntry.StopRealDateTime,
-            //IndexNumber
-            //ParentIndexNumber
+            IndexNumber = episode,
+            ParentIndexNumber = season,
             //MediaSources = [],
             //HomePageUrl
             //Artists
@@ -345,4 +351,28 @@ public class RecordingsChannel(
 
         return channelItem;
     }
+
+    private static (bool isMovie, int? Season, int? Episode) GetSeasonEpisode(DvrEventEntry item)
+    {
+        var match = SeasonEpisodeRegex().Match(
+            $"{item.EpisodeDisplay} {item.Filename}");
+
+        if (!match.Success)
+        {
+            return (true, null, null);
+        }
+
+        return (
+            false,
+            int.Parse(match.Groups[1].Success
+                ? match.Groups[1].Value
+                : match.Groups[3].Value),
+            int.Parse(match.Groups[2].Success
+                ? match.Groups[2].Value
+                : match.Groups[4].Value)
+        );
+    }
+
+    [GeneratedRegex(@"(?:Season\s*(\d+)\.Episode\s*(\d+)|S(\d+)E(\d+))", RegexOptions.IgnoreCase)]
+    private static partial Regex SeasonEpisodeRegex();
 }
