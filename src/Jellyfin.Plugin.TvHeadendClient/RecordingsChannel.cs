@@ -210,8 +210,7 @@ public partial class RecordingsChannel(
                     Protocol = MediaProtocol.Http,
                     IsRemote = true,
                     AnalyzeDurationMs = 500,
-                    BufferMs = 500,
-                    FallbackMaxStreamingBitrate = 30000000,
+                    FallbackMaxStreamingBitrate = 30_000_000,
                     UseMostCompatibleTranscodingProfile = !Plugin.Instance.Configuration.AllowFmp4TranscodingContainer,
                     MediaStreams =
                     [
@@ -223,11 +222,17 @@ public partial class RecordingsChannel(
 
         try
         {
-            var calculatedMediaSourceInfoTask = mediaEncoder.GetMediaInfo(
+            mediaSourceInfo = await mediaEncoder.GetMediaInfo(
                 new MediaInfoRequest { ExtractChapters = false, MediaSource = mediaSourceInfo, MediaType = DlnaProfileType.Video },
                 cancellationToken);
-            var calculatedMediaSourceInfo = await calculatedMediaSourceInfoTask.WaitAsync(TimeSpan.FromSeconds(5), cancellationToken);
-            mediaSourceInfo.MediaStreams = calculatedMediaSourceInfo.MediaStreams;
+
+            mediaSourceInfo.Id = id;
+            mediaSourceInfo.Path = playbackUrl;
+            mediaSourceInfo.Protocol = MediaProtocol.Http;
+            mediaSourceInfo.IsRemote = true;
+            mediaSourceInfo.AnalyzeDurationMs = 500;
+            mediaSourceInfo.FallbackMaxStreamingBitrate = 30000000;
+            mediaSourceInfo.UseMostCompatibleTranscodingProfile = !Plugin.Instance.Configuration.AllowFmp4TranscodingContainer;
         }
         catch (Exception ex)
         {

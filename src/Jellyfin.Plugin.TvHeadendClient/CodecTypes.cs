@@ -2,18 +2,18 @@ namespace Jellyfin.Plugin.TvHeadendClient;
 
 public static class CodecTypes
 {
-    public static readonly HashSet<string> VideoCodecs = new()
-    {
+    public static readonly HashSet<string> VideoCodecs =
+    [
         "h264",
         "mpeg2video",
         "hevc",
         "h265",
         "vp8",
         "vp9"
-    };
+    ];
 
-    public static readonly HashSet<string> AudioCodecs = new()
-    {
+    public static readonly HashSet<string> AudioCodecs =
+    [
         "aac",
         "ac3",
         "eac3",
@@ -21,7 +21,7 @@ public static class CodecTypes
         "mp3",
         "opus",
         "vorbis"
-    };
+    ];
 
-    public static readonly HashSet<string> SubtitleCodecs = new() { "dvbsub", "teletext", "subrip" };
+    public static readonly HashSet<string> SubtitleCodecs = ["dvbsub", "teletext", "subrip"];
 }
