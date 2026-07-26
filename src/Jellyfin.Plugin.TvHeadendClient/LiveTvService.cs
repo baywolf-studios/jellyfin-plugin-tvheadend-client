@@ -206,21 +206,21 @@ public class LiveTvService(
                     Status = entry.SchedStatus switch
                     {
                         "scheduled" => RecordingStatus.New,
-                    
+
                         "recording" => RecordingStatus.InProgress,
                         "recordingError" => RecordingStatus.InProgress,
-                    
+
                         "completed" => RecordingStatus.Completed,
                         "completedWarning" => RecordingStatus.Completed,
                         "completedRerecord" => RecordingStatus.Completed,
-                    
+
                         "completedError" => RecordingStatus.Error,
-                    
+
                         "cancelled" => RecordingStatus.Cancelled,
-                    
+
                         "conflictedOk" => RecordingStatus.ConflictedOk,
                         "conflictedNotOk" => RecordingStatus.ConflictedNotOk,
-                    
+
                         _ => RecordingStatus.Error
                     },
                     PrePaddingSeconds = entry.StartExtra * 60 ?? 0,
@@ -567,10 +567,11 @@ public class LiveTvService(
                 IsRemote = true,
                 AnalyzeDurationMs = 500,
                 IsInfiniteStream = true,
-                BufferMs = 500,
-                FallbackMaxStreamingBitrate = 30000000,
+                FallbackMaxStreamingBitrate = 30_000_000,
                 UseMostCompatibleTranscodingProfile = !Plugin.Instance.Configuration.AllowFmp4TranscodingContainer,
-                MediaStreams = mediaStreams
+                MediaStreams = mediaStreams,
+                RequiresOpening = true,
+                RequiresClosing = true,
             };
         }
         catch (Exception ex)

@@ -13,7 +13,7 @@ public class PluginConfiguration : BasePluginConfiguration
         Password = string.Empty;
         HideRecordingsChannel = false;
         ForceAllProgramsAsSeries = false;
-        AllowFmp4TranscodingContainer = false;
+        AllowFmp4TranscodingContainer = true;
     }
 
     public string Host { get; set; }
