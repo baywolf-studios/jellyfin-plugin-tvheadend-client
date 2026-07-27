@@ -9,6 +9,14 @@
     "owner": "Bay Wolf Studios LLC",
     "versions": [
       {
+        "changelog": "## :sparkles: What's New\r\n\r\n* consolidate recording parsing logic (#42) @matthewpritchett\r\n",
+        "checksum": "d47b6cf49510eae1bb6bbbbedfa98693",
+        "sourceUrl": "https://github.com/baywolf-studios/jellyfin-plugin-tvheadend-client/releases/download/v13/tvheadend-client_13.0.0.0.zip",
+        "targetAbi": "10.11.0.0",
+        "timestamp": "2026-07-27T16:01:41Z",
+        "version": "13.0.0.0"
+      },
+      {
         "changelog": "<!-- Optional: add a release summary here -->\r\n## :sparkles: What's New\r\n\r\n* Performance improvments and recordings fixes (#40) @matthewpritchett\r\n",
         "checksum": "a559107a32ae545713d4c5ca93bb9007",
         "sourceUrl": "https://github.com/baywolf-studios/jellyfin-plugin-tvheadend-client/releases/download/v12/tvheadend-client_12.0.0.0.zip",
