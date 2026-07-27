@@ -1,3 +1,4 @@
+using System.Globalization;
 using Jellyfin.Plugin.TvHeadendClient.Helpers;
 using Jellyfin.Plugin.TvHeadendClient.TVHeadendApiClient;
 using Jellyfin.Plugin.TvHeadendClient.TVHeadendApiClient.Models;
@@ -415,13 +416,13 @@ public class LiveTvService(
                     ShortOverview = entry.Summary,
                     StartDate = entry.StartDateTime ?? DateTime.UtcNow,
                     EndDate = entry.StopDateTime ?? DateTime.UtcNow.AddHours(1),
-                    // Genres
+                    Genres = entry.Category.Select(CultureInfo.InvariantCulture.TextInfo.ToTitleCase).ToList(),
                     // OriginalAirDate
                     IsHD = entry.Hd,
                     // Is3D
                     // Audio
                     // CommunityRating
-                    IsRepeat = entry.Repeat ?? true,
+                    IsRepeat = entry.Repeat ?? !(entry.New ?? false),
                     // IsSubjectToBlackout
                     EpisodeTitle = entry.Subtitle,
                     // ImagePath
@@ -430,14 +431,17 @@ public class LiveTvService(
                     // LogoImageUrl
                     // BackdropImageUrl
                     HasImage = imageInfo.HasImage,
-                    // IsMovie
-                    // IsSports
-                    IsSeries = Plugin.Instance.Configuration.ForceAllProgramsAsSeries || !string.IsNullOrEmpty(entry.Subtitle),
+                    IsMovie = entry.Category.Contains("movie", StringComparer.OrdinalIgnoreCase),
+                    IsSports =  entry.Category.Any(c => c.Contains("sport", StringComparison.OrdinalIgnoreCase)),
+                    IsSeries =
+                        Plugin.Instance.Configuration.ForceAllProgramsAsSeries ||
+                        !string.IsNullOrEmpty(entry.Subtitle) ||
+                        entry.Category.Contains("series", StringComparer.OrdinalIgnoreCase),
                     // IsLive
-                    // IsNews
-                    // IsKids
+                    IsNews = entry.Category.Contains("news"),
+                    IsKids = entry.Category.Contains("children") || entry.Category.Contains("kids"),
                     // IsEducational
-                    // IsPremiere
+                    //IsPremiere
                     ProductionYear = entry.CopyrightYear,
                     // HomePageUrl
                     // SeriesId
