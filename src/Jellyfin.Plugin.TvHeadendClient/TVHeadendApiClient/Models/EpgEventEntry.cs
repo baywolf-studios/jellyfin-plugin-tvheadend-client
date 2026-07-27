@@ -39,4 +39,10 @@ public record EpgEventEntry
     [JsonPropertyName("image")] public string? Image { get; init; }
 
     [JsonPropertyName("copyright_year")] public int? CopyrightYear { get; init; }
+
+    [JsonPropertyName("category")]
+    public List<string> Category { get; init; } = [];
+
+    [JsonPropertyName("new")]
+    public bool? New { get; init; }
 }
