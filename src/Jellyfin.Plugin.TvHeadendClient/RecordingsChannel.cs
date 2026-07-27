@@ -281,7 +281,7 @@ public partial class RecordingsChannel(
                         var season = g.Key;
                         return new ChannelItemInfo
                         {
-                            Name = (season == 0) ? "Unknown" : $"Season {season}",
+                            Name = $"Season {season}",
                             Id = $"season:{Uri.EscapeDataString(seriesName)}:{season}",
                             Type = ChannelItemType.Folder,
                             FolderType = ChannelFolderType.Season,
@@ -367,7 +367,7 @@ public partial class RecordingsChannel(
         {
             Name = contentType == ChannelMediaContentType.Episode
                 ? string.IsNullOrWhiteSpace(dvrEventEntry.Subtitle)
-                    ? dvrEventEntry.StartRealDateTime?.ToString("g", CultureInfo.CurrentCulture)
+                    ? dvrEventEntry.StartDateTime?.ToLocalTime().ToString("g", CultureInfo.CurrentCulture)
                     : dvrEventEntry.Subtitle
                 : dvrEventEntry.Title,
             SeriesName = contentType == ChannelMediaContentType.Episode ? dvrEventEntry.Title : null,

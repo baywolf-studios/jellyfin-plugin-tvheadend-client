@@ -8,6 +8,12 @@ public record DvrEventEntry
 
     [JsonPropertyName("enabled")] public bool? Enabled { get; init; }
 
+    [JsonPropertyName("start")] public int? Start { get; init; }
+
+    [JsonIgnore]
+    public DateTime? StartDateTime =>
+        Start.HasValue ? DateTimeOffset.FromUnixTimeSeconds(Start.Value).UtcDateTime : null;
+
     [JsonPropertyName("start_extra")] public int? StartExtra { get; init; }
 
     [JsonPropertyName("start_real")] public long? StartReal { get; init; }
