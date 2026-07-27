@@ -62,7 +62,6 @@ public partial class RecordingsChannel(
         logger.LogDebug("GetChannelItems: Getting recording items");
 
         var result = new ChannelItemResult();
-        var channelItems = new List<ChannelItemInfo>();
 
         try
         {
@@ -76,104 +75,11 @@ public partial class RecordingsChannel(
 
             await Task.WhenAll(upcomingDvrEventsTask, finishedDvrEventsTask);
 
-            var allDvrEvents = upcomingDvrEventsTask.Result.Entries.Concat(finishedDvrEventsTask.Result.Entries);
+            var allDvrEvents = upcomingDvrEventsTask.Result.Entries.Concat(finishedDvrEventsTask.Result.Entries).ToList();
 
-            var playableDvrEvents = allDvrEvents
-                .Where(r =>
-                    !string.IsNullOrEmpty(r.Filename) &&
-                    !string.IsNullOrEmpty(r.Url) &&
-                    _playableStatuses.Contains(r.SchedStatus ?? string.Empty))
-                .Select(r =>
-                {
-                    var (season, episode) = GetSeasonEpisodeInfo(r);
+            result.Items = BuildChannelItems(allDvrEvents, query.FolderId);
 
-                    return new { Recording = r, Season = season, Episode = episode };
-                }).ToList();
-
-
-
-            if (string.IsNullOrWhiteSpace(query.FolderId))
-            {
-                var rootItems = playableDvrEvents
-                    .GroupBy(e => e.Recording.Title ?? string.Empty)
-                    .Select(group =>
-                    {
-                        var items = group.ToList();
-
-                        if (items.Count == 1 && string.IsNullOrWhiteSpace(items.Single().Recording.Subtitle))
-                        {
-                            return ConvertToChannelItem(items.Single().Recording, ChannelMediaContentType.Movie);
-                        }
-
-                        var hasSeasons = items.All(e => e.Season.HasValue);
-
-                        return new ChannelItemInfo
-                            {
-                                Name = group.Key,
-                                Id = hasSeasons
-                                    ? $"series:{Uri.EscapeDataString(group.Key)}"
-                                    : $"recordings:{Uri.EscapeDataString(group.Key)}",
-                                Type = ChannelItemType.Folder,
-                                FolderType = hasSeasons
-                                    ? ChannelFolderType.Series
-                                    : ChannelFolderType.Container,
-                                ImageUrl = ImageUtilities
-                                    .GetImageInfo(items.First().Recording.Image, appHost)
-                                    .ImageUrl
-                            };
-                    });
-
-                channelItems.AddRange(rootItems);
-            }
-            else if (query.FolderId.StartsWith("series:", StringComparison.Ordinal))
-            {
-                var seriesName = Uri.UnescapeDataString(query.FolderId["series:".Length..]);
-
-                var seasons = playableDvrEvents
-                    .Where(e => e.Recording.Title == seriesName && e.Season.HasValue)
-                    .DistinctBy(e => e.Season)
-                    .Select(e =>
-                        new ChannelItemInfo
-                        {
-                            Name = $"Season {e.Season}",
-                            Id = $"season:{Uri.EscapeDataString(seriesName)}:{e.Season}",
-                            Type = ChannelItemType.Folder,
-                            FolderType = ChannelFolderType.Season,
-                            ContentType = ChannelMediaContentType.Episode,
-                            ImageUrl = ImageUtilities
-                                .GetImageInfo(e.Recording.Image, appHost)
-                                .ImageUrl
-                        }
-                    );
-
-                channelItems.AddRange(seasons);
-            }
-            else if (query.FolderId.StartsWith("recordings:", StringComparison.Ordinal))
-            {
-                var title = Uri.UnescapeDataString(query.FolderId["recordings:".Length..]);
-
-                var episodes = playableDvrEvents
-                    .Where(e =>
-                        e.Recording.Title == title)
-                    .Select(e => ConvertToChannelItem(e.Recording, ChannelMediaContentType.Episode));
-
-                channelItems.AddRange(episodes);
-            }
-            else if (query.FolderId.StartsWith("season:", StringComparison.Ordinal))
-            {
-                var parts = query.FolderId.Split(':', 3);
-
-                var seriesName = Uri.UnescapeDataString(parts[1]);
-                var season = int.Parse(parts[2], CultureInfo.InvariantCulture);
-
-                var episodes = playableDvrEvents
-                    .Where(e => e.Recording.Title == seriesName && e.Season == season)
-                    .Select(e => ConvertToChannelItem(e.Recording, ChannelMediaContentType.Episode));
-                channelItems.AddRange(episodes);
-            }
-
-            logger.LogDebug("GetChannelItems: Retrieved {Count} items", channelItems.Count);
-            result.Items = channelItems;
+            logger.LogDebug("GetChannelItems: Retrieved {Count} items", result.Items.Count);
         }
         catch (Exception ex)
         {
@@ -303,25 +209,13 @@ public partial class RecordingsChannel(
 
             await Task.WhenAll(upcomingRecordingsTask, finishedRecordingsTask);
 
-            var allRecordings = upcomingRecordingsTask.Result.Entries.Concat(finishedRecordingsTask.Result.Entries);
-            var playableRecordings = allRecordings.Where(r =>
-                !string.IsNullOrEmpty(r.Filename) &&
-                !string.IsNullOrEmpty(r.Url) &&
-                _playableStatuses.Contains(r.SchedStatus ?? string.Empty)).ToList();
+            var allRecordings = upcomingRecordingsTask.Result.Entries.Concat(finishedRecordingsTask.Result.Entries).ToList();
 
-            logger.LogDebug("GetLatestMedia: Retrieved {Count} playable recordings", playableRecordings.Count);
+            var items = BuildChannelItems(allRecordings, "latest");
 
-            return playableRecordings
-                .GroupBy(r => r.Title ?? string.Empty)
-                .SelectMany(group =>
-                {
-                    var contentType = (group.Count() == 1 && string.IsNullOrWhiteSpace(group.Single().Subtitle))
-                        ? ChannelMediaContentType.Movie
-                        : ChannelMediaContentType.Episode;
+            logger.LogDebug("GetLatestMedia: Retrieved {Count} playable recordings", items.Count);
 
-                    return group.Select(r => ConvertToChannelItem(r, contentType));
-                })
-                .OrderByDescending(r => r.EndDate);
+            return items.OrderByDescending(r => r.EndDate);
         }
         catch (Exception ex)
         {
@@ -330,7 +224,135 @@ public partial class RecordingsChannel(
         }
     }
 
-    private ChannelItemInfo ConvertToChannelItem(DvrEventEntry dvrEventEntry, ChannelMediaContentType contentType)
+    private List<ChannelItemInfo> BuildChannelItems(IEnumerable<DvrEventEntry> dvrEventEntries, string? folderId)
+    {
+        var channelItems = dvrEventEntries
+            .Where(r =>
+                !string.IsNullOrEmpty(r.Filename) &&
+                !string.IsNullOrEmpty(r.Url) &&
+                _playableStatuses.Contains(r.SchedStatus ?? string.Empty))
+            .Select(dvrEventEntry =>
+            {
+                var (season, episode) = GetSeasonEpisodeInfo(dvrEventEntry);
+                return (
+                    Recording: dvrEventEntry,
+                    Season: season,
+                    Episode: episode
+                );
+            })
+            .ToList();
+
+        if (folderId?.StartsWith("recordings:", StringComparison.Ordinal) == true)
+        {
+            var title = Uri.UnescapeDataString(folderId["recordings:".Length..]);
+
+            return channelItems
+                .Where(e => e.Recording.Title == title)
+                .Select(e => ConvertToChannelItem(
+                    e.Recording,
+                    ChannelMediaContentType.Episode,
+                    e.Season,
+                    e.Episode))
+                .ToList();
+        }
+
+        if (folderId?.StartsWith("season:", StringComparison.Ordinal) == true)
+        {
+            var parts = folderId.Split(':', 3);
+
+            var seriesName = Uri.UnescapeDataString(parts[1]);
+            var season = int.Parse(parts[2], CultureInfo.InvariantCulture);
+
+            return channelItems
+                .Where(e => e.Recording.Title == seriesName && (e.Season ?? 0) == season)
+                .Select(e => ConvertToChannelItem(e.Recording, ChannelMediaContentType.Episode, e.Season ?? 0, e.Episode))
+                .ToList();
+        }
+
+        if (folderId?.StartsWith("series:", StringComparison.Ordinal) == true)
+        {
+            var seriesName = Uri.UnescapeDataString(folderId["series:".Length..]);
+
+            return channelItems
+                .Where(e => e.Recording.Title == seriesName)
+                .GroupBy(item => item.Season ?? 0)
+                .Select(g =>
+                    {
+                        var season = g.Key;
+                        return new ChannelItemInfo
+                        {
+                            Name = (season == 0) ? "Unknown" : $"Season {season}",
+                            Id = $"season:{Uri.EscapeDataString(seriesName)}:{season}",
+                            Type = ChannelItemType.Folder,
+                            FolderType = ChannelFolderType.Season,
+                            ContentType = ChannelMediaContentType.Episode,
+                            ImageUrl = ImageUtilities
+                                .GetImageInfo(g.First().Recording.Image, appHost)
+                                .ImageUrl
+                        };
+                    }
+                )
+                .ToList();
+        }
+
+        return channelItems
+            .GroupBy(channelItem => channelItem.Recording.Title ?? string.Empty)
+            .SelectMany(group =>
+            {
+                var items = group.ToList();
+
+                var isMovie =
+                    items.Count == 1 &&
+                    string.IsNullOrWhiteSpace(items[0].Recording.Subtitle) &&
+                    !items[0].Season.HasValue &&
+                    !items[0].Episode.HasValue;
+
+                if (isMovie)
+                {
+                    return
+                    [
+                        ConvertToChannelItem(
+                            items[0].Recording,
+                            ChannelMediaContentType.Movie,
+                            null,
+                            null)
+                    ];
+                }
+
+                if (folderId == "latest")
+                {
+                    return items.Select(item =>
+                        ConvertToChannelItem(
+                            item.Recording,
+                            ChannelMediaContentType.Episode,
+                            item.Season,
+                            item.Episode));
+                }
+
+                var hasSeasons = items.Any(item => item.Season.HasValue);
+
+                return
+                [
+                    new ChannelItemInfo
+                    {
+                        Name = group.Key,
+                        Id = hasSeasons
+                            ? $"series:{Uri.EscapeDataString(group.Key)}"
+                            : $"recordings:{Uri.EscapeDataString(group.Key)}",
+                        Type = ChannelItemType.Folder,
+                        FolderType = hasSeasons
+                            ? ChannelFolderType.Series
+                            : ChannelFolderType.Container,
+                        ImageUrl = ImageUtilities
+                            .GetImageInfo(items[0].Recording.Image, appHost)
+                            .ImageUrl
+                    }
+                ];
+            })
+            .ToList();
+    }
+
+    private ChannelItemInfo ConvertToChannelItem(DvrEventEntry dvrEventEntry, ChannelMediaContentType contentType, int? season, int? episode)
     {
         if (string.IsNullOrEmpty(dvrEventEntry.Uuid) || string.IsNullOrEmpty(dvrEventEntry.Url))
         {
@@ -341,11 +363,12 @@ public partial class RecordingsChannel(
 
         var isCurrentlyRecording = dvrEventEntry.SchedStatus == "recording";
         var imageInfo = ImageUtilities.GetImageInfo(dvrEventEntry.Image, appHost);
-        var (season, episode) = GetSeasonEpisodeInfo(dvrEventEntry);
         var channelItem = new ChannelItemInfo
         {
             Name = contentType == ChannelMediaContentType.Episode
-                ? dvrEventEntry.Subtitle ?? dvrEventEntry.StartRealDateTime?.ToString("g", CultureInfo.CurrentCulture)
+                ? string.IsNullOrWhiteSpace(dvrEventEntry.Subtitle)
+                    ? dvrEventEntry.StartRealDateTime?.ToString("g", CultureInfo.CurrentCulture)
+                    : dvrEventEntry.Subtitle
                 : dvrEventEntry.Title,
             SeriesName = contentType == ChannelMediaContentType.Episode ? dvrEventEntry.Title : null,
             Id = dvrEventEntry.Uuid,
@@ -386,7 +409,7 @@ public partial class RecordingsChannel(
 
         return channelItem;
     }
-    
+
     private static (int? Season, int? Episode) GetSeasonEpisodeInfo(DvrEventEntry item)
     {
         var match = SeasonEpisodeRegex().Match($"{item.EpisodeDisplay} {item.Filename}");
