@@ -9,6 +9,14 @@
     "owner": "Bay Wolf Studios LLC",
     "versions": [
       {
+        "changelog": "## :sparkles: What's New\r\n\r\n* added category parsing for guide data (#46) @matthewpritchett\r\n",
+        "checksum": "0728cdc832433d8d7bba71bdf2364978",
+        "sourceUrl": "https://github.com/baywolf-studios/jellyfin-plugin-tvheadend-client/releases/download/v15/tvheadend-client_15.0.0.0.zip",
+        "targetAbi": "10.11.0.0",
+        "timestamp": "2026-07-27T19:40:47Z",
+        "version": "15.0.0.0"
+      },
+      {
         "changelog": "## :sparkles: What's New\r\n\r\n* display fixes (#44) @matthewpritchett\r\n",
         "checksum": "3bb82995a6052b8e0a7ff50d13772ed3",
         "sourceUrl": "https://github.com/baywolf-studios/jellyfin-plugin-tvheadend-client/releases/download/v14/tvheadend-client_14.0.0.0.zip",
