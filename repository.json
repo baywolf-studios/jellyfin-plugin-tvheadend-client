@@ -9,6 +9,14 @@
     "owner": "Bay Wolf Studios LLC",
     "versions": [
       {
+        "changelog": "<!-- Optional: add a release summary here -->\r\n## :sparkles: What's New\r\n\r\n* ignoreDts (#52) @matthewpritchett\r\n",
+        "checksum": "a71c3f8e550231c4ba60ba654d3548bb",
+        "sourceUrl": "https://github.com/baywolf-studios/jellyfin-plugin-tvheadend-client/releases/download/v17/tvheadend-client_17.0.0.0.zip",
+        "targetAbi": "12.0.0.0",
+        "timestamp": "2026-09-11T17:17:57Z",
+        "version": "17.0.0.0"
+      },
+      {
         "changelog": "<!-- Optional: add a release summary here -->\r\n## :sparkles: What's New\r\n\r\n* Increase AnalyzeDurationMs (#49) @matthewpritchett\r\n",
         "checksum": "2a631c5d216adad333d5c2660a1c27a6",
         "sourceUrl": "https://github.com/baywolf-studios/jellyfin-plugin-tvheadend-client/releases/download/v16/tvheadend-client_16.0.0.0.zip",
