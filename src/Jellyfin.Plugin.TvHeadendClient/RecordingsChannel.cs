@@ -133,7 +133,7 @@ public partial class RecordingsChannel(
                     Path = playbackUrl,
                     Protocol = MediaProtocol.Http,
                     IsRemote = true,
-                    AnalyzeDurationMs = 500,
+                    AnalyzeDurationMs = 5000,
                     FallbackMaxStreamingBitrate = 30_000_000,
                     UseMostCompatibleTranscodingProfile = !Plugin.Instance.Configuration.AllowFmp4TranscodingContainer,
                     MediaStreams =
@@ -154,7 +154,7 @@ public partial class RecordingsChannel(
             mediaSourceInfo.Path = playbackUrl;
             mediaSourceInfo.Protocol = MediaProtocol.Http;
             mediaSourceInfo.IsRemote = true;
-            mediaSourceInfo.AnalyzeDurationMs = 500;
+            mediaSourceInfo.AnalyzeDurationMs = 5000;
             mediaSourceInfo.FallbackMaxStreamingBitrate = 30000000;
             mediaSourceInfo.UseMostCompatibleTranscodingProfile = !Plugin.Instance.Configuration.AllowFmp4TranscodingContainer;
         }
