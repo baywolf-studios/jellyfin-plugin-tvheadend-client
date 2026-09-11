@@ -568,7 +568,6 @@ public class LiveTvService(
                 Id = streamId,
                 Path = streamUrl,
                 Protocol = MediaProtocol.Http,
-                IsRemote = true,
                 AnalyzeDurationMs = 5000,
                 IsInfiniteStream = true,
                 FallbackMaxStreamingBitrate = 30_000_000,
