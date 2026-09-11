@@ -569,13 +569,13 @@ public class LiveTvService(
                 Path = streamUrl,
                 Protocol = MediaProtocol.Http,
                 IsRemote = true,
-                AnalyzeDurationMs = 500,
+                AnalyzeDurationMs = 5000,
                 IsInfiniteStream = true,
                 FallbackMaxStreamingBitrate = 30_000_000,
                 UseMostCompatibleTranscodingProfile = !Plugin.Instance.Configuration.AllowFmp4TranscodingContainer,
                 MediaStreams = mediaStreams,
                 RequiresOpening = true,
-                RequiresClosing = true,
+                RequiresClosing = true
             };
         }
         catch (Exception ex)
